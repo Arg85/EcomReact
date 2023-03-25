@@ -5,7 +5,9 @@ const { createTunnel } = require("./Helper/tunnel");
 const ProductCategory = require("./Models/productCategorySchema");
 const cors = require("cors");
 const Product = require("./Models/productSchema ");
-
+const ProductCategoryRoute=require("./Routes/ProductCategoryRoute")
+const ProductRoute=require("./Routes/ProductRoute");
+const mongooseConnectDB = require("./Config/db");
 const app = express();
 app.use(cors());
 
@@ -27,43 +29,15 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Home");
 });
-app.post("/AddProductCategory", async (req, res) => {
-  if (req.body) {
-    const productCategory = await ProductCategory(req.body).save();
-    if (productCategory) {
-      console.log(productCategory);
-      res.send("Category Created");
-    }
-  }
-});
-app.post("/AddProduct", async (req, res) => {
-  if (req.body) {
-    const product = await Product(req.body).save();
-    if (product) {
-        const productCategory=await ProductCategory.findByIdAndUpdate({_id:req.body.category},{  $push: {
-            products: product._id,
-          },})
-      console.log(productCategory,"----------",product);
-      res.send("product Created");
-    }
-  }
-});
-
-
-app.get("/SPA", (req, res) => {
-  res.send("Hi from the other Side Anjali");
-});
+app.use("/",ProductCategoryRoute);
+app.use("/",ProductRoute);
+// app.get("/SPA", (req, res) => {
+//   res.send("Hi from the other Side Anjali");
+// });
 
 app.listen(process.env.PORT, () => {
     createTunnel(process.env.PORT);
-  mongoose
-    .connect(process.env.MONGODB_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
-    .then(() => {
-      console.log("successfully connected to Mongo DB");
-    });
+ mongooseConnectDB(process.env.MONGODB_URL)
   
   console.log(`Server runnning at PORT ${process.env.PORT}`);
 });
