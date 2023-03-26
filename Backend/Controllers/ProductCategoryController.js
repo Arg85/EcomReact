@@ -1,3 +1,5 @@
+const ProductCategory = require("../Models/productCategorySchema");
+
 const addProductCategory = async (req, res) => {
   if (req.body) {
     const productCategory = await ProductCategory(req.body).save();
